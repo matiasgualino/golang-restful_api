@@ -73,3 +73,67 @@ func TypeCreate(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 }
+
+// --------------------------------AttributeTypes--------------------------------
+func AttributeTypesIndex(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(attributeTypes); err != nil {
+		panic(err)
+	}
+}
+
+// --------------------------------BeaconTypes--------------------------------
+func BeaconTypesShow(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	var beacon_id = vars["beacon_id"]
+	var beacon = RepoFindBeacon(beacon_id)
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(beacon.Types); err != nil {
+		panic(err)
+	}
+	return
+
+	// If we didn't find it, 404
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(http.StatusNotFound)
+	if err := json.NewEncoder(w).Encode(jsonErr{Code: http.StatusNotFound, Text: "Not Found"}); err != nil {
+		panic(err)
+	}
+
+}
+
+func BeaconTypesCreate(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	var beacon_id = vars["beacon_id"]
+	var beacon = RepoFindBeacon(beacon_id)
+
+	var types Types
+
+	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
+	if err != nil {
+		panic(err)
+	}
+	if err := r.Body.Close(); err != nil {
+		panic(err)
+	}
+	if err := json.Unmarshal(body, &types); err != nil {
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		w.WriteHeader(422) // unprocessable entity
+		if err := json.NewEncoder(w).Encode(err); err != nil {
+			panic(err)
+		}
+	}
+
+	RepoDestroyBeacon(beacon_id)
+	beacon.Types = types
+
+	beacon = RepoCreateBeacon(beacon)
+
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(http.StatusCreated)
+	if err := json.NewEncoder(w).Encode(beacon.Types); err != nil {
+		panic(err)
+	}
+}

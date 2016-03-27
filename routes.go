@@ -36,4 +36,22 @@ var routes = Routes{
 		"/types/{type_id}",
 		TypeShow,
 	},
+	Route{
+		"AtributeTypesIndex",
+		"GET",
+		"/attribute_types",
+		AttributeTypesIndex,
+	},
+	Route{
+		"BeaconTypesShow",
+		"GET",
+		"/beacon/{beacon_id}/types",
+		BeaconTypesShow,
+	},
+	Route{
+		"BeaconTypesCreate",
+		"POST",
+		"/beacon/{beacon_id}/types",
+		BeaconTypesCreate,
+	},
 }
