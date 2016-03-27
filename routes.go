@@ -54,4 +54,40 @@ var routes = Routes{
 		"/beacon/{beacon_id}/types",
 		BeaconTypesCreate,
 	},
+	Route{
+		"ApplicationsIndex",
+		"GET",
+		"/applications/",
+		ApplicationsIndex,
+	},
+	Route{
+		"ApplicationShow",
+		"GET",
+		"/applications/{application_id}",
+		ApplicationShow,
+	},
+	Route{
+		"ApplicationBeaconsShow",
+		"GET",
+		"/applications/{application_id}/beacons",
+		ApplicationBeaconsShow,
+	},
+	Route{
+		"ApplicationBeaconsCreate",
+		"POST",
+		"/applications/{application_id}/beacons",
+		ApplicationBeaconsCreate,
+	},
+	Route{
+		"ApplicationTypesShow",
+		"GET",
+		"/applications/{application_id}/types",
+		ApplicationTypesShow,
+	},
+	Route{
+		"ApplicationTypesCreate",
+		"POST",
+		"/applications/{application_id}/types",
+		ApplicationTypesCreate,
+	},
 }

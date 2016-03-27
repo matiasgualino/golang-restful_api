@@ -7,6 +7,7 @@ var currentId int
 var types Types
 var attributeTypes AttributeTypes
 var beacons Beacons
+var applications Applications
 
 // Give us some seed data
 func init() {
@@ -28,17 +29,50 @@ func init() {
 	RepoCreateAttributeType(AttributeType{Name: "Cadena", Id: "String"})
 	RepoCreateAttributeType(AttributeType{Name: "Booleano", Id: "Boolean"})
 
-	multipleTypes := Types{
-		Type{Name: "Red", Attributes: att},
-		Type{Name: "Mesa", Attributes: mesaAtt},
+	redType := Type{Name: "Red", Attributes: att}
+	mesaType := Type{Name: "Mesa", Attributes: mesaAtt}
+	blueType := Type{Name: "Blue", Attributes: att}
+
+	mixedTypes := Types{
+		redType,
+		mesaType,
+		blueType,
 	}
 
-	types := Types{
-		Type{Name: "Blue", Attributes: att},
+	colorTypes := Types{
+		blueType,
+		redType,
 	}
 
-	RepoCreateBeacon(Beacon{Id: "1-1-1-1", PublicKey: "1", Minor: "1", Major: "1", UUID: "1", Types: multipleTypes})
-	RepoCreateBeacon(Beacon{Id: "2-2-2-2", PublicKey: "2", Minor: "2", Major: "2", UUID: "2", Types: types})
+	redBeacon := Beacon{Id: "1-1-1-1", PublicKey: "1", Minor: "1", Major: "1", UUID: "1", Types: Types{redType}}
+	blueBeacon := Beacon{Id: "1-2-2-2", PublicKey: "1", Minor: "2", Major: "2", UUID: "2", Types: Types{blueType}}
+
+	colorBeacons := Beacons{
+		redBeacon,
+		blueBeacon,
+	}
+
+	mixedBeacon := Beacon{Id: "2-1-1-1", PublicKey: "2", Minor: "1", Major: "1", UUID: "1", Types: Types{redType, mesaType}}
+	blueMixedBeacon := Beacon{Id: "2-2-2-2", PublicKey: "2", Minor: "2", Major: "2", UUID: "2", Types: Types{blueType}}
+
+	mixedTypesBeacons := Beacons{
+		mixedBeacon,
+		blueMixedBeacon,
+	}
+
+	colorApplication := Application{Id: "123456", PublicKey: "1", Description: "Aplicacion paleta de colores",
+		Name: "Color Palette", Active: true, Types: colorTypes, Beacons: colorBeacons}
+
+	mixedTypesApplication := Application{Id: "654321", PublicKey: "2", Description: "Aplicacion con multiples tipos",
+		Name: "Mixed Types", Active: true, Types: mixedTypes, Beacons: mixedTypesBeacons}
+
+	RepoCreateBeacon(redBeacon)
+	RepoCreateBeacon(blueBeacon)
+	RepoCreateBeacon(mixedBeacon)
+	RepoCreateBeacon(blueMixedBeacon)
+
+	RepoCreateApplication(colorApplication)
+	RepoCreateApplication(mixedTypesApplication)
 
 }
 
@@ -102,4 +136,30 @@ func RepoDestroyBeacon(id string) error {
 		}
 	}
 	return fmt.Errorf("Could not find beacon with id of %d to delete", id)
+}
+
+// ------------------------------------------------------------------------------------
+
+func RepoFindApplication(id string) Application {
+	for _, a := range applications {
+		if a.Id == id {
+			return a
+		}
+	}
+	return Application{}
+}
+
+func RepoCreateApplication(a Application) Application {
+	applications = append(applications, a)
+	return a
+}
+
+func RepoDestroyApplication(id string) error {
+	for i, a := range applications {
+		if a.Id == id {
+			applications = append(applications[:i], applications[i+1:]...)
+			return nil
+		}
+	}
+	return fmt.Errorf("Could not find application with id of %d to delete", id)
 }
